@@ -146,6 +146,367 @@ tr:hover td{background:var(--gray-50)}
   .nav-tabs{padding:0 20px}
   .map-layout{grid-template-columns:1fr}
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  body {
+    padding: 0;
+    font-size: 14px;
+    -webkit-text-size-adjust: 100%;
+  }
+  
+  /* Better touch targets */
+  button, .zoom-btn, .rank-item, .nav-tab {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .container {
+    padding: 0;
+    margin: 0;
+  }
+  
+  .content {
+    padding: 10px;
+  }
+  
+  .panel {
+    padding: 0;
+  }
+  
+  /* Hero Section */
+  .hero {
+    padding: 20px 15px;
+    min-height: auto;
+  }
+  
+  .hero-top {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .hero h1 {
+    font-size: 24px;
+    line-height: 1.2;
+  }
+  
+  .hero-stats {
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 15px;
+  }
+  
+  .stat-card {
+    min-width: 100%;
+    padding: 16px;
+  }
+  
+  .stat-card h3 {
+    font-size: 12px;
+  }
+  
+  .stat-card .stat-value {
+    font-size: 26px;
+  }
+  
+  /* Navigation */
+  .nav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 10px;
+  }
+  
+  .nav-tab {
+    white-space: nowrap;
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+  
+  /* Nationality Select */
+  #nationality-select {
+    font-size: 16px; /* Prevents iOS zoom on focus */
+    padding: 12px;
+    max-width: 100%;
+    width: 100%;
+    margin: 10px 0;
+  }
+  
+  /* Map Panel */
+  .map-layout {
+    grid-template-columns: 1fr !important;
+    gap: 20px;
+  }
+  
+  .map-card {
+    width: 100%;
+    order: 1;
+  }
+  
+  .map-container {
+    height: 350px;
+    min-height: 350px;
+  }
+  
+  #japan-map {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .sidebar {
+    width: 100% !important;
+    order: 2;
+  }
+  
+  .sidebar-card {
+    margin-bottom: 15px;
+  }
+  
+  /* Charts */
+  .chart-wrap {
+    padding: 15px;
+    min-height: auto !important;
+  }
+  
+  .chart-wrap h2 {
+    font-size: 18px;
+  }
+  
+  /* Bar charts */
+  #bar-chart {
+    max-height: 2000px !important;
+  }
+  
+  #regions-bar-chart {
+    max-height: 320px !important;
+  }
+  
+  /* Historical Growth Chart - Stack Vertically */
+  #panel-chart .chart-wrap > div:last-child {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  
+  #historical-chart-wrapper {
+    width: 100% !important;
+    height: 300px !important;
+    margin-bottom: 20px;
+  }
+  
+  /* Historical chart header */
+  #panel-chart .chart-wrap > div:first-child {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+  
+  #historical-subtitle {
+    font-size: 12px;
+    margin-top: 6px;
+  }
+  
+  #legend-wrapper {
+    width: 100% !important;
+    max-height: 200px;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: #f8fafc;
+    border-radius: 8px;
+  }
+  
+  #historical-stats {
+    width: 100% !important;
+    margin-bottom: 20px;
+  }
+  
+  /* Reset button */
+  #reset-chart-btn {
+    font-size: 11px;
+    padding: 6px 12px;
+  }
+  
+  /* Regions Grid */
+  .regions-grid {
+    grid-template-columns: 1fr !important;
+    gap: 15px;
+    padding: 15px 10px;
+  }
+  
+  .region-card {
+    padding: 15px;
+  }
+  
+  .region-card h3 {
+    font-size: 16px;
+  }
+  
+  .region-card .stat-grid {
+    gap: 8px;
+  }
+  
+  .region-card .stat-item {
+    font-size: 11px;
+  }
+  
+  /* Table */
+  .table-controls {
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px;
+    align-items: stretch;
+  }
+  
+  .search-input {
+    width: 100%;
+    font-size: 14px;
+    padding: 10px;
+  }
+  
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -15px;
+    padding: 0 15px;
+  }
+  
+  #data-table {
+    font-size: 11px;
+    min-width: 900px; /* Ensure table doesn't collapse */
+  }
+  
+  #data-table th,
+  #data-table td {
+    padding: 8px 6px;
+    white-space: nowrap;
+  }
+  
+  #data-table tfoot td {
+    position: sticky;
+    bottom: 0;
+    background: #f8fafc;
+    font-size: 11px;
+    padding: 10px 6px;
+  }
+  
+  .pref-cell {
+    min-width: 100px;
+    font-size: 11px;
+  }
+  
+  .rank-cell {
+    min-width: 40px;
+  }
+  
+  /* Top 10 List */
+  .rank-item {
+    padding: 8px 4px;
+    font-size: 13px;
+  }
+  
+  .rank-num {
+    width: 24px;
+    height: 24px;
+    font-size: 11px;
+  }
+  
+  .rank-name {
+    font-size: 13px;
+  }
+  
+  .rank-val {
+    font-size: 12px;
+  }
+  
+  /* Selection Popup */
+  #selection-popup {
+    padding: 12px;
+    margin-top: 12px;
+    font-size: 12px;
+  }
+  
+  #selection-title {
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+  
+  #reset-selection-btn {
+    font-size: 11px;
+    padding: 6px 10px;
+    min-height: 32px;
+    min-width: 60px;
+  }
+  
+  /* Tooltip */
+  #tooltip {
+    font-size: 12px;
+    max-width: 250px;
+  }
+  
+  #tooltip h4 {
+    font-size: 13px;
+  }
+  
+  .tt-row {
+    font-size: 11px;
+  }
+  
+  /* Zoom Controls */
+  .zoom-controls {
+    right: 10px;
+    top: 10px;
+    gap: 8px;
+  }
+  
+  .zoom-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  
+  .zoom-btn:active {
+    transform: scale(0.95);
+  }
+  
+  /* Download Button */
+  .download-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 13px;
+  }
+  
+  /* Hide elements that don't work well on mobile */
+  .hero p {
+    font-size: 11px;
+    line-height: 1.3;
+  }
+}
+
+/* Extra small devices (phones in portrait) */
+@media (max-width: 480px) {
+  .hero h1 {
+    font-size: 20px;
+  }
+  
+  .stat-card h3 {
+    font-size: 11px;
+  }
+  
+  .stat-card .stat-value {
+    font-size: 22px;
+  }
+  
+  .nav-tab {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+  
+  .chart-wrap h2 {
+    font-size: 16px;
+  }
+  
+  #data-table {
+    font-size: 11px;
+  }
+}
 </style>
 </head>
 <body>
@@ -10321,7 +10682,9 @@ function highlightLine(datasetIndex) {
   // Toggle selection
   if(selectedLineIndex === datasetIndex) {
     selectedLineIndex = null;
-    statsPanel.style.display = 'none';
+    
+    // Restore All Foreign Residents stats
+    displayAllForeignResidentsStats();
     
     // Restore all lines to full opacity
     historicalChart.data.datasets.forEach(function(dataset, idx) {
@@ -10504,8 +10867,18 @@ function displayStats(natData) {
 
 function closeStatsPanel() {
   var statsPanel = document.getElementById('historical-stats');
-  statsPanel.style.display = 'none';
   selectedLineIndex = null;  // Reset selection
+  
+  // Check if we're in "All Foreign Residents" mode
+  var showingAll = currentNationality === 'total';
+  
+  if(showingAll) {
+    // Restore All Foreign Residents stats instead of hiding
+    displayAllForeignResidentsStats();
+  } else {
+    // Hide stats panel for single nationality mode
+    statsPanel.style.display = 'none';
+  }
   
   // Color palette - must match buildHistoricalChart
   var colors = ['#0ea5e9','#10b981','#f59e0b','#8b5cf6','#ec4899','#14b8a6','#f97316','#06b6d4','#84cc16','#a855f7','#eab308','#6366f1','#22c55e','#ef4444','#64748b','#0891b2','#d946ef','#facc15','#71717a'];
@@ -10852,5 +11225,74 @@ function resetSelection() {
 
 </script>
 
+
+<script>
+// Mobile-specific improvements
+(function() {
+  // Detect if mobile device
+  var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  
+  if (isMobile) {
+    // Prevent double-tap zoom on buttons and interactive elements
+    var preventDoubleTapZoom = function(e) {
+      e.preventDefault();
+      e.target.click();
+    };
+    
+    // Add to all buttons
+    document.querySelectorAll('button, .zoom-btn, .nav-tab').forEach(function(el) {
+      el.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        this.click();
+      });
+    });
+    
+    // Better touch handling for chart interactions
+    var charts = document.querySelectorAll('canvas');
+    charts.forEach(function(canvas) {
+      canvas.style.touchAction = 'pan-y pinch-zoom';
+    });
+    
+    // Improve table scrolling indicator
+    var tableWrap = document.querySelector('.table-wrap');
+    if (tableWrap) {
+      var showScrollIndicator = function() {
+        var table = tableWrap.querySelector('table');
+        if (table && table.scrollWidth > tableWrap.clientWidth) {
+          tableWrap.style.boxShadow = 'inset -10px 0 10px -10px rgba(0,0,0,0.2)';
+        }
+      };
+      showScrollIndicator();
+      window.addEventListener('resize', showScrollIndicator);
+    }
+    
+    // Add visual feedback for touch on rank items
+    document.querySelectorAll('.rank-item').forEach(function(item) {
+      item.addEventListener('touchstart', function() {
+        this.style.transform = 'scale(0.98)';
+      });
+      item.addEventListener('touchend', function() {
+        this.style.transform = 'scale(1)';
+      });
+    });
+    
+    // Prevent iOS Safari from zooming on input focus
+    var inputs = document.querySelectorAll('input, select');
+    inputs.forEach(function(input) {
+      input.addEventListener('focus', function() {
+        if (this.style.fontSize !== '16px') {
+          this.dataset.originalFontSize = this.style.fontSize;
+          this.style.fontSize = '16px';
+        }
+      });
+      input.addEventListener('blur', function() {
+        if (this.dataset.originalFontSize) {
+          this.style.fontSize = this.dataset.originalFontSize;
+        }
+      });
+    });
+  }
+})();
+</script>
 </body>
 </html>
