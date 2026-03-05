@@ -25,7 +25,6 @@ body{font-family:-apple-system,'Inter',sans-serif;background:var(--gray-50);colo
 .hero-inner{max-width:1400px;margin:0 auto;position:relative;z-index:1}
 .hero-top{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:24px;flex-wrap:wrap}
 .hero-text h1{font-size:28px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px}
-.hero-text h1 span{color:#fbbf24}
 .hero-text p{font-size:14px;opacity:.7;margin-top:4px}
 .hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:4px 12px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
 .nationality-selector{display:flex;gap:8px;align-items:center}
@@ -53,8 +52,10 @@ body{font-family:-apple-system,'Inter',sans-serif;background:var(--gray-50);colo
 .map-card p{font-size:12px;color:var(--gray-400);margin-bottom:16px}
 .map-container{position:relative}
 #japan-map{width:100%;height:auto}
-.prefecture{stroke:white;stroke-width:.5;cursor:pointer;transition:opacity .15s}
-.prefecture:hover{opacity:.75;stroke-width:1.5;stroke:var(--indigo)}
+.prefecture{stroke:rgba(255,255,255,.25);stroke-width:.5;cursor:pointer;transition:all .2s}
+.prefecture:hover{filter:brightness(1.15);stroke:rgba(255,255,255,.5);stroke-width:1}
+.prefecture.selected{stroke:#fbbf24;stroke-width:2;filter:drop-shadow(0 0 3px rgba(251,191,36,.4))}
+.prefecture.dimmed{opacity:.2}
 
 .zoom-controls{position:absolute;top:10px;right:10px;display:flex;flex-direction:column;gap:8px;z-index:10}
 .zoom-btn{width:32px;height:32px;background:white;border:1px solid var(--gray-300);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--gray-600);cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,.1);transition:all .2s}
@@ -63,7 +64,7 @@ body{font-family:-apple-system,'Inter',sans-serif;background:var(--gray-50);colo
 .legend{display:flex;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap}
 .legend-scale{flex:1;min-width:160px}
 .legend-label{font-size:11px;color:var(--gray-500);display:flex;justify-content:space-between;margin-bottom:4px}
-.legend-bar{height:10px;border-radius:5px;background:linear-gradient(90deg,#fef3c7,#a3e635,#14b8a6,#0284c7,#172554)}
+.legend-bar{height:10px;border-radius:5px;background:linear-gradient(90deg,#7dd3fc,#0284c7,#075985,#0c4a6e,#082f49)}
 
 .sidebar-card{background:white;border-radius:16px;border:1px solid var(--gray-200);padding:20px;box-shadow:0 1px 8px rgba(0,0,0,.04)}
 .sidebar-card h3{font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:16px;display:flex;align-items:center;gap:6px}
@@ -276,29 +277,19 @@ tr:hover td{background:var(--gray-50)}
   }
   
   /* Bar charts */
-  /* Make All Prefectures chart scrollable on mobile */
   #all-prefectures-chart {
-    max-height: 500px;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 15px 10px;
-    background: white;
-    box-shadow: inset 0 -10px 10px -10px rgba(0,0,0,0.1);
+    border: none;
+    padding: 0;
+    background: transparent;
   }
   
-  #all-prefectures-chart h2::after {
-    content: ' (scroll ↕)';
-    font-size: 12px;
-    font-weight: normal;
-    color: #64748b;
+  #all-prefectures-chart h2 {
+    margin-bottom: 6px;
   }
-  
-  #bar-chart {
-    max-height: 1800px !important;
-    min-height: 1800px !important;
-    width: 100% !important;
+
+  #all-prefectures-chart .regions-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
   
   #regions-bar-chart {
@@ -558,7 +549,7 @@ tr:hover td{background:var(--gray-50)}
   <div class="hero-inner">
     <div class="hero-top">
       <div class="hero-text">
-        <h1 id="hero-title">All Foreign Residents in <span>Japan</span></h1>
+        <h1 id="hero-title"><span style="color:#facc15">All Foreign Residents</span> in <span style="color:white">Japan</span></h1>
         <p style="font-size:12px;opacity:.8;margin-top:8px;line-height:1.4">
           <strong>Data Source:</strong> Ministry of Justice, Immigration Services Agency of Japan<br>
           <strong>Data Date:</strong> December 31, 2024 (Official Statistics)
@@ -684,7 +675,7 @@ tr:hover td{background:var(--gray-50)}
     <div class="chart-wrap" id="all-prefectures-chart">
       <h2>Population - All Prefectures</h2>
       <p id="chart-subtitle"></p>
-      <canvas id="bar-chart" style="max-height:1800px"></canvas>
+      <div id="all-prefs-html" class="regions-grid" style="margin-top:12px"></div>
     </div>
   </div>
 
@@ -9847,12 +9838,13 @@ var tableSearch = '';
 
 function updateHeroStats() {
   var data = ETHNICITY_DATA[currentNationality];
-  document.getElementById('hero-title').innerHTML = data.title + ' in <span>Japan</span>';
+  document.getElementById('hero-title').innerHTML = '<span style="color:#facc15">' + data.title + '</span> in <span style="color:white">Japan</span>';
   
   var stat1, stat2, stat3;
   
   if(data.rank === 'N/A') {
     // For "All Foreign Residents"
+    document.getElementById('hero-title').innerHTML = '<span style="color:#facc15">All Foreign Residents</span> in <span style="color:white">Japan</span>';
     stat1 = '<div class="hero-stat"><div class="hero-stat-num">All</div><div class="hero-stat-label">Nationality Rank</div></div>';
     stat2 = '<div class="hero-stat"><div class="hero-stat-num">' + data.total.toLocaleString() + '</div><div class="hero-stat-label">Total Population</div></div>';
     stat3 = '<div class="hero-stat"><div class="hero-stat-num">' + data.pctOfForeigners + '</div><div class="hero-stat-label">Pct. Of All Foreign Residents</div></div>';
@@ -9884,15 +9876,16 @@ function updateMap() {
   }
   
   function getColor(pop) {
-    if(pop === 0) return '#f1f5f9';
+    if(pop === 0) return '#f8fafc';
     var ratio = pop / maxVal;
-    // Use square root for better distribution
+    // Use square root for better distribution - blue shades
     var adjusted = Math.sqrt(ratio);
-    if(adjusted > 0.7) return '#172554';
-    if(adjusted > 0.4) return '#0284c7';
-    if(adjusted > 0.2) return '#14b8a6';
-    if(adjusted > 0.1) return '#a3e635';
-    return '#fef3c7';
+    // Even higher thresholds = even more prefectures in lighter shades
+    if(adjusted > 0.90) return '#082f49';  // Very dark - only top ~10%
+    if(adjusted > 0.70) return '#0c4a6e';  // Dark - next ~15%
+    if(adjusted > 0.45) return '#075985';  // Medium - next ~20%
+    if(adjusted > 0.20) return '#0284c7';  // Light-medium -next ~25%
+    return '#7dd3fc';  // Very light - remaining ~30%
   }
   
   if(window.mapGroup) {
@@ -9927,102 +9920,70 @@ function updateTop10() {
 }
 
 function buildBarChart() {
-  if(barChart) barChart.destroy();
-  
   var data = ETHNICITY_DATA[currentNationality];
-  var allPrefs = data.prefectures.slice(); // All 47 prefectures
-  var labels = [];
-  var values = [];
-  var colors = [];
-  
+
+  // All 47 prefectures sorted by population descending
+  var allPrefs = data.prefectures.slice();
+  allPrefs.sort(function(a,b){ return b.pop - a.pop; });
+
+  var maxP = allPrefs[0].pop;
+
+  var html = '<div class="region-card" style="margin-top:12px">';
+  html += '<div style="padding:16px 20px;border-bottom:1px solid #f1f5f9">';
+  html += '<div style="display:flex;justify-content:space-between;align-items:center">';
+  html += '<div><div style="font-size:15px;font-weight:700;color:#1e293b">All 47 Prefectures</div>';
+  html += '<div style="font-size:12px;color:#94a3b8;margin-top:2px">Ranked by population · colored by region</div></div>';
+  html += '<div style="text-align:right"><div style="font-size:18px;font-weight:800;color:#1e293b">' + data.total.toLocaleString() + '</div>';
+  html += '<div style="font-size:11px;color:#94a3b8">national total</div></div>';
+  html += '</div></div>';
+  html += '<div style="padding:12px 20px">';
+
   for(var i=0; i<allPrefs.length; i++) {
-    labels.push(allPrefs[i].name);
-    values.push(allPrefs[i].pop);
-    colors.push(REGION_COLORS[allPrefs[i].region]);
-  }
-  
-  var ctx = document.getElementById('bar-chart').getContext('2d');
-  barChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: data.title + ' Population',
-        data: values,
-        backgroundColor: colors.map(function(c) { return c + 'cc'; }),
-        borderColor: colors,
-        borderWidth: 1,
-        borderRadius: 4
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: 'rgba(255, 255, 255, 0.98)',
-          titleColor: '#1e293b',
-          bodyColor: '#475569',
-          borderColor: '#e2e8f0',
-          borderWidth: 1,
-          padding: 12,
-          titleFont: { size: 14, weight: 'bold' },
-          bodyFont: { size: 12 },
-          displayColors: false,
-          callbacks: {
-            title: function(context) {
-              var pref = allPrefs[context[0].dataIndex];
-              return pref.name + ' (#' + pref.rank + ')';
-            },
-            label: function(context) {
-              var pref = allPrefs[context.dataIndex];
-              var pctNat = (pref.pop / data.total * 100).toFixed(2);
-              
-              // Get total foreign resident population for this prefecture
-              var totalForeignData = ETHNICITY_DATA['total'];
-              var totalForResPop = 0;
-              for(var j = 0; j < totalForeignData.prefectures.length; j++) {
-                if(totalForeignData.prefectures[j].name === pref.name) {
-                  totalForResPop = totalForeignData.prefectures[j].pop;
-                  break;
-                }
-              }
-              
-              var pctFor = totalForResPop > 0 ? (pref.pop / totalForResPop * 100).toFixed(2) : '0.00';
-              var pctPref = (pref.pop / pref.prefPop * 100).toFixed(2);
-              
-              return [
-                'Region: ' + pref.region,
-                'Population: ' + pref.pop.toLocaleString(),
-                '% of Nationality Pop: ' + pctNat + '%',
-                '% of Foreign Residence: ' + pctFor + '%',
-                '% of Prefecture Pop: ' + pctPref + '%'
-              ];
-            }
-          }
-        }
-      },
-      scales: {
-        x: { 
-          grid: { color: '#f1f5f9' }, 
-          ticks: { 
-            callback: function(v) { 
-              return v >= 1000 ? Math.round(v / 1000) + 'K' : v; 
-            } 
-          }
-        },
-        y: { 
-          grid: { display: false }, 
-          ticks: { 
-            font: { size: 11 },
-            autoSkip: false  // Show all 47 prefecture names
-          }
-        }
+    var p = allPrefs[i];
+    var color = REGION_COLORS[p.region] || '#94a3b8';
+    var barPct = maxP > 0 ? (p.pop / maxP * 100).toFixed(1) : 0;
+    
+    // Calculate percentages for hover tooltip
+    var pctNat = (p.pop / data.total * 100).toFixed(2);
+    var totalForeignData = ETHNICITY_DATA['total'];
+    var totalForResPop = 0;
+    for(var j = 0; j < totalForeignData.prefectures.length; j++) {
+      if(totalForeignData.prefectures[j].name === p.name) {
+        totalForResPop = totalForeignData.prefectures[j].pop;
+        break;
       }
     }
-  });
+    var pctFor = totalForResPop > 0 ? (p.pop / totalForResPop * 100).toFixed(2) : '0.00';
+    var pctPref = (p.pop / p.prefPop * 100).toFixed(2);
+    
+    // Build hover data attributes
+    var hoverData = 'data-name="' + p.name + '" ' +
+                    'data-rank="' + p.rank + '" ' +
+                    'data-region="' + p.region + '" ' +
+                    'data-pop="' + p.pop.toLocaleString() + '" ' +
+                    'data-pctnat="' + pctNat + '" ' +
+                    'data-pctfor="' + pctFor + '" ' +
+                    'data-pctpref="' + pctPref + '" ' +
+                    'data-color="' + color + '"';
+    
+    html += '<div class="region-pref" onmouseover="showPrefectureTooltip(this, event)" onmousemove="movePrefectureTooltip(event)" onmouseout="hidePrefectureTooltip()" onclick="handlePrefectureClick(\'' + p.code + '\')" style="cursor:pointer" ' + hoverData + '>';
+    html += '<div class="region-pref-name" style="width:110px">' + p.name + '</div>';
+    html += '<div class="region-pref-bar-wrap"><div class="region-pref-bar" style="width:' + barPct + '%;background:' + color + '"></div></div>';
+    html += '<div class="region-pref-val">' + p.pop.toLocaleString() + '</div>';
+    html += '</div>';
+  }
+
+  html += '</div></div>';
+
+  var container = document.getElementById('all-prefs-html');
+  if(container) container.innerHTML = html;
+}
+function toggleAllPref(el) {
+  var rid = el.getAttribute('data-rid');
+  var body = document.getElementById('b-' + rid);
+  var chev = document.getElementById('chev-' + rid);
+  if(body) body.classList.toggle('open');
+  if(chev) chev.classList.toggle('open');
 }
 
 var regionsBarChart = null;
@@ -10613,7 +10574,7 @@ function buildHistoricalChart() {
               
               if(firstVal && lastVal) {
                 var growth = ((lastVal - firstVal) / firstVal * 100).toFixed(1);
-                return '\nGrowth 2007-2024: ' + (growth >= 0 ? '+' : '') + growth + '%';
+                return '\nOverall Growth 2007-2024: ' + (growth >= 0 ? '+' : '') + growth + '%';
               }
               return '';
             }
@@ -10881,9 +10842,20 @@ function displayAllForeignResidentsStats() {
     var growthColor = growth >= 0 ? '#10b981' : '#ef4444';
     var growthSign = growth >= 0 ? '+' : '';
     
+    // Calculate average annual growth rate (17 years from 2007 to 2024)
+    var years = 17;
+    var avgAnnualGrowth = (growth / years).toFixed(2);
+    
     html += '<div style="margin-top:8px;padding:16px;background:white;border-radius:8px;border:2px solid ' + growthColor + '40">';
-    html += '<div style="font-size:11px;font-weight:600;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em">2007-2024 Growth</div>';
+    html += '<div style="font-size:11px;font-weight:600;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em">2007-2024 Overall Growth</div>';
     html += '<div style="font-size:32px;font-weight:700;color:' + growthColor + ';line-height:1">' + growthSign + growth + '%</div>';
+    html += '</div>';
+    
+    // Add average annual growth section
+    html += '<div style="margin-top:8px;padding:16px;background:white;border-radius:8px;border:2px solid ' + growthColor + '40">';
+    html += '<div style="font-size:11px;font-weight:600;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em">Average Annual Growth Rate</div>';
+    html += '<div style="font-size:28px;font-weight:700;color:' + growthColor + ';line-height:1">' + growthSign + avgAnnualGrowth + '%</div>';
+    html += '<div style="font-size:10px;color:#94a3b8;margin-top:4px">per year (2007-2024)</div>';
     html += '</div>';
   }
   
@@ -10931,9 +10903,20 @@ function displayStats(natData) {
     var growthColor = growth >= 0 ? '#10b981' : '#ef4444';
     var growthSign = growth >= 0 ? '+' : '';
     
+    // Calculate average annual growth rate (17 years from 2007 to 2024)
+    var years = 17;
+    var avgAnnualGrowth = (growth / years).toFixed(2);
+    
     html += '<div style="margin-top:8px;padding:16px;background:white;border-radius:8px;border:2px solid ' + growthColor + '40">';
-    html += '<div style="font-size:11px;font-weight:600;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em">2007-2024 Growth</div>';
+    html += '<div style="font-size:11px;font-weight:600;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em">2007-2024 Overall Growth</div>';
     html += '<div style="font-size:32px;font-weight:700;color:' + growthColor + ';line-height:1">' + growthSign + growth + '%</div>';
+    html += '</div>';
+    
+    // Add average annual growth section
+    html += '<div style="margin-top:8px;padding:16px;background:white;border-radius:8px;border:2px solid ' + growthColor + '40">';
+    html += '<div style="font-size:11px;font-weight:600;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em">Average Annual Growth Rate</div>';
+    html += '<div style="font-size:28px;font-weight:700;color:' + growthColor + ';line-height:1">' + growthSign + avgAnnualGrowth + '%</div>';
+    html += '<div style="font-size:10px;color:#94a3b8;margin-top:4px">per year (2007-2024)</div>';
     html += '</div>';
   }
   
@@ -11001,15 +10984,16 @@ d3.json('https://unpkg.com/jpn-atlas@1/japan/japan.json').then(function(japan) {
   }
   
   function getColor(pop) {
-    if(pop === 0) return '#f1f5f9';
+    if(pop === 0) return '#f8fafc';
     var ratio = pop / maxVal;
-    // Use square root for better distribution
+    // Use square root for better distribution - blue shades
     var adjusted = Math.sqrt(ratio);
-    if(adjusted > 0.7) return '#172554';
-    if(adjusted > 0.4) return '#0284c7';
-    if(adjusted > 0.2) return '#14b8a6';
-    if(adjusted > 0.1) return '#a3e635';
-    return '#fef3c7';
+    // Even higher thresholds = even more prefectures in lighter shades
+    if(adjusted > 0.90) return '#082f49';  // Very dark - only top ~10%
+    if(adjusted > 0.70) return '#0c4a6e';  // Dark - next ~15%
+    if(adjusted > 0.45) return '#075985';  // Medium - next ~20%
+    if(adjusted > 0.20) return '#0284c7';  // Light-medium -next ~25%
+    return '#7dd3fc';  // Very light - remaining ~30%
   }
   
   window.mapGroup = svg.append('g');
@@ -11214,15 +11198,11 @@ function updateMapSelection() {
     .style('opacity', function(d) {
       if(selectedPrefectures.length === 0) return 1;
       var code = String(d.id).padStart(2, '0');
-      return selectedPrefectures.indexOf(code) > -1 ? 1 : 0.3;
+      return selectedPrefectures.indexOf(code) > -1 ? 1 : 0.2;
     })
-    .style('stroke', function(d) {
+    .classed('selected', function(d) {
       var code = String(d.id).padStart(2, '0');
-      return selectedPrefectures.indexOf(code) > -1 ? '#0ea5e9' : '#fff';
-    })
-    .style('stroke-width', function(d) {
-      var code = String(d.id).padStart(2, '0');
-      return selectedPrefectures.indexOf(code) > -1 ? 2 : 1;
+      return selectedPrefectures.indexOf(code) > -1;
     });
 }
 
@@ -11299,6 +11279,63 @@ function resetSelection() {
   updateMapSelection();
   updateTop10Selection();
   updateSelectionPopup();
+}
+
+// Bar chart hover tooltip functions
+function showPrefectureTooltip(element, event) {
+  var tooltip = document.getElementById('tooltip');
+  if(!tooltip) return;
+  
+  var name = element.dataset.name;
+  var rank = element.dataset.rank;
+  var region = element.dataset.region;
+  var pop = element.dataset.pop;
+  var pctNat = element.dataset.pctnat;
+  var pctFor = element.dataset.pctfor;
+  var pctPref = element.dataset.pctpref;
+  var color = element.dataset.color;
+  
+  tooltip.innerHTML = '<h4>' + name + ' (#' + rank + ')</h4>' +
+    '<div class="tt-row"><div class="tt-dot" style="background:' + color + '"></div>' +
+    '<div class="tt-label">' + region + '</div></div>' +
+    '<div class="tt-row"><div class="tt-label">Population</div><div class="tt-val">' + pop + '</div></div>' +
+    '<div class="tt-row"><div class="tt-label">% of Nationality Pop</div><div class="tt-val">' + pctNat + '%</div></div>' +
+    '<div class="tt-row"><div class="tt-label">% of Foreign Residence</div><div class="tt-val">' + pctFor + '%</div></div>' +
+    '<div class="tt-row"><div class="tt-label">% of Prefecture Pop</div><div class="tt-val">' + pctPref + '%</div></div>';
+  
+  tooltip.style.opacity = '1';
+  movePrefectureTooltip(event);
+}
+
+function movePrefectureTooltip(event) {
+  var tooltip = document.getElementById('tooltip');
+  if(!tooltip) return;
+  
+  // Position tooltip near the mouse but ensure it stays on screen
+  var x = event.pageX + 15;
+  var y = event.pageY - 10;
+  
+  // Boundary checks
+  var tooltipRect = tooltip.getBoundingClientRect();
+  var viewportWidth = window.innerWidth;
+  var viewportHeight = window.innerHeight;
+  
+  if(x + tooltipRect.width > viewportWidth) {
+    x = event.pageX - tooltipRect.width - 15;
+  }
+  if(y + tooltipRect.height > viewportHeight) {
+    y = event.pageY - tooltipRect.height - 10;
+  }
+  
+  tooltip.style.left = x + 'px';
+  tooltip.style.top = y + 'px';
+}
+
+function hidePrefectureTooltip() {
+  var tooltip = document.getElementById('tooltip');
+  if(tooltip) {
+    tooltip.style.opacity = '0';
+  }
 }
 
 </script>
