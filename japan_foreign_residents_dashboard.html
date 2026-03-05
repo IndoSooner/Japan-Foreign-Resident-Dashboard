@@ -121,23 +121,26 @@ tr:hover td{background:var(--gray-50)}
 .mini-bar{height:4px;background:linear-gradient(90deg,var(--indigo),var(--sky));border-radius:2px;min-width:2px;max-width:60px}
 .region-cell{display:flex;align-items:center;gap:6px}
 
-.regions-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:20px}
-.region-card{background:white;border-radius:16px;border:1px solid var(--gray-200);padding:24px;box-shadow:0 1px 8px rgba(0,0,0,.04)}
-.region-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--gray-100)}
-.region-color{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.region-info h3{font-size:16px;font-weight:700;color:var(--gray-800);line-height:1.2}
-.region-info p{font-size:12px;color:var(--gray-400);margin-top:2px}
-.region-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:18px}
-.region-stat{background:var(--gray-50);border-radius:8px;padding:10px 12px}
-.region-stat-label{font-size:10px;color:var(--gray-500);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
-.region-stat-val{font-size:18px;font-weight:800;color:var(--gray-900)}
-.region-prefs{display:flex;flex-direction:column;gap:6px}
-.region-pref{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:6px;transition:background .15s;cursor:pointer}
-.region-pref:hover{background:var(--gray-50)}
-.region-pref-name{flex:1;font-size:12px;font-weight:600;color:var(--gray-700)}
-.region-pref-name small{font-weight:400;color:var(--gray-400);display:block;font-size:10px;margin-top:1px}
-.region-pref-val{font-size:12px;font-weight:700;color:var(--gray-900);text-align:right}
-.chevron{font-size:12px;color:var(--gray-400);transition:transform .2s}
+.regions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+.region-card{background:white;border-radius:16px;border:1px solid var(--gray-200);overflow:hidden;box-shadow:0 1px 8px rgba(0,0,0,.04)}
+.region-header{padding:16px 20px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.region-header:hover{background:var(--gray-50)}
+.region-title{display:flex;align-items:center;gap:10px;flex:1}
+.region-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.region-info h3{font-size:15px;font-weight:700;color:var(--gray-800);margin:0;line-height:1.2}
+.region-info p{font-size:12px;color:var(--gray-400);margin-top:1px}
+.region-sum{text-align:right}
+.region-sum-num{font-size:18px;font-weight:800;color:var(--gray-900)}
+.region-sum-pct{font-size:11px;color:var(--gray-400);margin-top:1px}
+.region-prefs{border-top:1px solid var(--gray-100);padding:12px 20px;display:none}
+.region-prefs.open{display:block}
+.region-pref{display:flex;align-items:center;gap:10px;padding:5px 0}
+.region-pref-name{font-size:12px;font-weight:600;color:var(--gray-700);width:100px;flex-shrink:0}
+.region-pref-name small{display:none}
+.region-pref-bar-wrap{flex:1;height:5px;background:var(--gray-100);border-radius:3px;overflow:hidden}
+.region-pref-bar{height:100%;border-radius:3px}
+.region-pref-val{font-size:12px;font-weight:700;color:var(--gray-800);width:60px;text-align:right;flex-shrink:0}
+.chevron{transition:transform .2s;color:var(--gray-400);font-size:14px}
 .chevron.open{transform:rotate(180deg)}
 
 @media(max-width:768px){
@@ -349,22 +352,40 @@ tr:hover td{background:var(--gray-50)}
   .regions-grid {
     grid-template-columns: 1fr !important;
     gap: 15px;
-    padding: 15px 10px;
+    padding: 10px;
   }
   
-  .region-card {
-    padding: 15px;
+  .region-header {
+    padding: 14px 16px;
   }
   
-  .region-card h3 {
+  .region-info h3 {
+    font-size: 14px;
+  }
+  
+  .region-info p {
+    font-size: 11px;
+  }
+  
+  .region-sum-num {
     font-size: 16px;
   }
   
-  .region-card .stat-grid {
-    gap: 8px;
+  .region-sum-pct {
+    font-size: 10px;
   }
   
-  .region-card .stat-item {
+  .region-prefs {
+    padding: 10px 16px;
+  }
+  
+  .region-pref-name {
+    width: 80px;
+    font-size: 11px;
+  }
+  
+  .region-pref-val {
+    width: 50px;
     font-size: 11px;
   }
   
@@ -10284,10 +10305,27 @@ function renderTable() {
 function buildRegions() {
   var data = ETHNICITY_DATA[currentNationality];
   var regionLabels = ['Hokkaido','Tohoku','Kanto','Chubu','Kinki','Chugoku','Shikoku','Kyushu'];
-  var html = '';
   
+  // Calculate totals for each region
+  var regionTotals = [];
   for(var r=0; r<regionLabels.length; r++) {
     var rname = regionLabels[r];
+    var total = 0;
+    for(var i=0; i<data.prefectures.length; i++) {
+      if(data.prefectures[i].region === rname) {
+        total += data.prefectures[i].pop;
+      }
+    }
+    regionTotals.push({name: rname, total: total});
+  }
+  
+  // Sort by total population (descending)
+  regionTotals.sort(function(a, b) { return b.total - a.total; });
+  
+  var html = '';
+  
+  for(var r=0; r<regionTotals.length; r++) {
+    var rname = regionTotals[r].name;
     var prefs = [];
     for(var i=0; i<data.prefectures.length; i++) {
       if(data.prefectures[i].region === rname) {
@@ -10297,28 +10335,34 @@ function buildRegions() {
     
     if(prefs.length === 0) continue;
     
-    var total = 0;
-    for(var i=0; i<prefs.length; i++) total += prefs[i].pop;
-    
+    var total = regionTotals[r].total;
     var pct = (total / data.total * 100).toFixed(1);
     var maxP = prefs[0].pop;
     var color = REGION_COLORS[rname];
     
     html += '<div class="region-card">' +
-      '<div class="region-header">' +
-      '<div class="region-color" style="background:' + color + '"></div>' +
+      '<div class="region-header" onclick="toggleRegion(\'' + rname + '\')">' +
+      '<div class="region-title">' +
+      '<div class="region-dot" style="background:' + color + '"></div>' +
       '<div class="region-info">' +
       '<h3>' + rname + '</h3>' +
-      '<p>' + prefs.length + ' prefecture' + (prefs.length > 1 ? 's' : '') + ' • ' + total.toLocaleString() + ' (' + pct + '%)</p>' +
+      '<p>' + prefs.length + ' prefecture' + (prefs.length > 1 ? 's' : '') + '</p>' +
       '</div></div>' +
-      '<div class="region-prefs">';
+      '<div class="region-sum">' +
+      '<div class="region-sum-num">' + total.toLocaleString() + '</div>' +
+      '<div class="region-sum-pct">' + pct + '% of national total</div>' +
+      '</div>' +
+      '<div class="chevron" id="chev-' + rname + '">▼</div>' +
+      '</div>' +
+      '<div class="region-prefs" id="body-' + rname + '">';
     
     for(var i=0; i<prefs.length; i++) {
       var p = prefs[i];
-      var barWidth = Math.max(2, Math.min(60, Math.round((p.pop / maxP) * 60)));
+      var barPct = (p.pop / maxP * 100).toFixed(1);
       html += '<div class="region-pref">' +
-        '<div class="region-pref-name">' + p.name + '<small>' + p.ja + '</small></div>' +
-        '<div class="pop-with-bar"><span class="region-pref-val">' + p.pop.toLocaleString() + '</span><div class="mini-bar" style="width:' + barWidth + 'px"></div></div>' +
+        '<div class="region-pref-name">' + p.name + '</div>' +
+        '<div class="region-pref-bar-wrap"><div class="region-pref-bar" style="width:' + barPct + '%;background:' + color + '"></div></div>' +
+        '<div class="region-pref-val">' + p.pop.toLocaleString() + '</div>' +
         '</div>';
     }
     
@@ -10326,6 +10370,20 @@ function buildRegions() {
   }
   
   document.getElementById('regions-grid').innerHTML = html;
+  
+  // Open all regions by default
+  for(var i = 0; i < regionTotals.length; i++) {
+    toggleRegion(regionTotals[i].name);
+  }
+}
+
+function toggleRegion(rname) {
+  var body = document.getElementById('body-' + rname);
+  var chev = document.getElementById('chev-' + rname);
+  if(body && chev) {
+    body.classList.toggle('open');
+    chev.classList.toggle('open');
+  }
 }
 
 // Historical Growth Chart
