@@ -9847,12 +9847,12 @@ function updateHeroStats() {
     document.getElementById('hero-title').innerHTML = '<span style="color:#facc15">All Foreign Residents</span> in <span style="color:white">Japan</span>';
     stat1 = '<div class="hero-stat"><div class="hero-stat-num">All</div><div class="hero-stat-label">Nationality Rank</div></div>';
     stat2 = '<div class="hero-stat"><div class="hero-stat-num">' + data.total.toLocaleString() + '</div><div class="hero-stat-label">Total Population</div></div>';
-    stat3 = '<div class="hero-stat"><div class="hero-stat-num">' + data.pctOfForeigners + '</div><div class="hero-stat-label">Pct. Of All Foreign Residents</div></div>';
+    stat3 = '<div class="hero-stat"><div class="hero-stat-num">' + data.pctOfForeigners + '</div><div class="hero-stat-label">Of All Foreign Residents</div></div>';
   } else {
     // For individual nationalities
     stat1 = '<div class="hero-stat"><div class="hero-stat-num">' + data.rank + '</div><div class="hero-stat-label">Nationality Rank</div></div>';
     stat2 = '<div class="hero-stat"><div class="hero-stat-num">' + data.total.toLocaleString() + '</div><div class="hero-stat-label">Total Population</div></div>';
-    stat3 = '<div class="hero-stat"><div class="hero-stat-num">' + data.pctOfForeigners + '</div><div class="hero-stat-label">Pct. Of All Foreign Residents</div></div>';
+    stat3 = '<div class="hero-stat"><div class="hero-stat-num">' + data.pctOfForeigners + '</div><div class="hero-stat-label">Of All Foreign Residents</div></div>';
   }
   
   document.getElementById('hero-stats').innerHTML = stat1 + stat2 + stat3;
